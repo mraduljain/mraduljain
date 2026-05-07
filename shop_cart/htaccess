@@ -1,0 +1,28 @@
+Options -Indexes
+Options +FollowSymLinks
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /shop_cart/
+
+    # Block access to hidden files
+    RewriteRule ^\.          -  [F,L]
+
+    # Allow direct access to real files and directories (assets, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Remove index.php from URL if already present (avoid double index.php)
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+shop_cart/index\.php/([^\s]+)
+    RewriteRule ^ %1 [R=301,L]
+
+    # Route all other requests through CI front controller
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # mod_rewrite not available — URLs will include index.php automatically
+    # Make sure $config['index_page'] = 'index.php'; in config.php
+    ErrorDocument 404 /shop_cart/index.php
+</IfModule>
